@@ -6,17 +6,14 @@ import igraph as ig
 import matplotlib.pyplot as plt
 import random 
 
-#sys.argv = ['berlin52.py','1','20','10','0.1','2.5','0.9','berlin52.tsp.txt']
+#sys.argv = ['mochila.py','1','1.4','1000','dat_3_200_1.txt']
 
-if len(sys.argv) == 8:
+if len(sys.argv) == 5:
     semilla = int(sys.argv[1])
-    col = int(sys.argv[2])
+    tau = float(sys.argv[2])
     ite = int(sys.argv[3])
-    tev = float(sys.argv[4])
-    B = float(sys.argv[5])
-    q0 = float(sys.argv[6])
-    entrada = sys.argv[7]
-    print('Parametros de entrada:',semilla, col, ite, tev, B, q0, entrada,'\n')
+    entrada = sys.argv[4]
+    print('Parametros de entrada:',semilla, tau, ite, entrada,'\n')
 else:
     print("Error en la entrada de los parámetros")
     print("Los parametros a ingresar son: Semilla, TamañoColonia, NroIteraciones, TasaEvaportacion, Beta, q0, DatosEntrada")
@@ -25,23 +22,36 @@ else:
 tiempo_proceso_ini = time.process_time()
 np.random.seed(semilla)
 
-##Llenar una matriz con los valores del archivo
-matrizCoordenadas = pd.read_table(entrada, header=None, skiprows=6, sep=" ", names=range(3))
-matrizCoordenadas = matrizCoordenadas.drop(index=(len(matrizCoordenadas)-1),axis=0)
-matrizCoordenadas = matrizCoordenadas.drop(columns=0,axis=1).to_numpy()
-numVariables = matrizCoordenadas.shape[0]
-#print('Matriz de coordenadas:\n', matrizCoordenadas,'\ntamaño',matrizCoordenadas.shape, '\ntipo',type(matrizCoordenadas))
+##Llenar una matriz con los valores del archivo   (ex matrizCoordenadas)
+matrizElementos = pd.read_table(entrada, header=None, skiprows=5, sep=",", names=range(4))
+matrizElementos = matrizElementos.drop(index=(len(matrizElementos)-1),axis=0)
+matrizElementos = matrizElementos.drop(columns=0,axis=1).to_numpy()
+numVariables = matrizElementos.shape[0]
+#print('Matriz de Elementos:\n', matrizElementos,'\ntamaño',matrizElementos.shape, '\ntipo',type(matrizElementos))
 #print('Número de variables:', numVariables,'\n')
 
-## Se crea matriz de distancia de 52x52
-matrizDistancias=np.full((numVariables,numVariables),fill_value=-1.0,dtype=float)
-for i in range(numVariables-1):
-    for j in range(i+1,numVariables):
-        matrizDistancias[i][j]=np.sqrt(np.sum(np.square(matrizCoordenadas[i]-matrizCoordenadas[j])))
-    ##
-        matrizDistancias[j][i]=matrizDistancias[i][j]
-#print('Matriz de Distancias: \n',matrizDistancias,'\ntamaño:',matrizDistancias.shape,'\ntipo:',type(matrizDistancias),'\n')
+#Función para calcular Ganancia mochila
+#n: num de items      #mE: vector solución      #moc: mochila a evaluar  
+def funCalculaGanancia(n,mE,moc):
+    aux = 0
+    for i in range(n-1):
+        aux += (mE[i][0]) * moc[i]
+    return aux
+#Función para calcular peso mochila
+def funCalculaPeso(n,mE,moc):
+    aux = 0
+    for i in range(n-1):
+        aux += (mE[i][1]) * moc[i]
+    return aux
 
+## Se crea matriz mochila (ex matrizDistancias)
+matrizMochila = matrizElementos[:, 2]
+print(matrizMochila)
+
+print("Ganancia mochila: ", funCalculaGanancia(numVariables,matrizElementos,matrizMochila))
+print("Peso mochila: ", funCalculaPeso(numVariables,matrizElementos,matrizMochila))
+
+"""
 ## Generar matriz heuristica 1/matrizDistancia
 matrizHeuristica = np.full_like(matrizDistancias, fill_value=1/matrizDistancias, dtype=float)
 #print('Matriz de Heurística: \n', matrizHeuristica, '\ntamaño:', matrizHeuristica.shape, '\ntipo:', type(matrizHeuristica),'\n')
@@ -50,13 +60,7 @@ matrizHeuristica = np.full_like(matrizDistancias, fill_value=1/matrizDistancias,
 colonia=np.full((col, numVariables), fill_value=-1, dtype=int)
 #print('Colonia:\n',colonia, '\ntamaño:', colonia.shape, '\ntipo:', type(colonia),'\n')
 
-#Función para calcular el costo de la solucion
-#n: num de var      #s: vector solución     #c: matriz de distancias
-def solucionCalculaCosto(n,s,c):
-    aux = c[s[n-1]][s[0]]
-    for i in range(n-1):
-        aux += c[s[i]][s[i+1]]
-    return aux
+
 
 #Creación primera solución y se asigna como mejor solución encontrada
 solucionOptima = np.array([0,48,31,44,18,40,7,8,9,42,32,50,10,51,13,12,46,25,26,27,11,24,3,5,14,4,23,47,37,36,39,38,35,34,33,43,45,15,28,49,19,22,29,1,6,41,20,16,2,17,30,21,-2])
@@ -206,3 +210,5 @@ ig.plot(imprimeGrafo(numVariables,solucionMejor), loyout=mc)
 
 
 ##plt.plot(imprimeGrafo(numVariables,solucionMejor), loyout=mc)
+
+"""
