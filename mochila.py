@@ -16,11 +16,13 @@ if len(sys.argv) == 5:
     print('Parametros de entrada:',semilla, tau, ite, entrada,'\n')
 else:
     print("Error en la entrada de los parámetros")
-    print("Los parametros a ingresar son: Semilla, TamañoColonia, NroIteraciones, TasaEvaportacion, Beta, q0, DatosEntrada")
+    print("Los parametros a ingresar son: Semilla, Tau, NroIteraciones, DatosEntrada")
     sys.exit(0)
 
 tiempo_proceso_ini = time.process_time()
 np.random.seed(semilla)
+
+capacidad=1000
 
 ##Llenar una matriz con los valores del archivo   (ex matrizCoordenadas)
 matrizElementos = pd.read_table(entrada, header=None, skiprows=5, sep=",", names=range(4))
@@ -31,7 +33,7 @@ numVariables = matrizElementos.shape[0]
 #print('Número de variables:', numVariables,'\n')
 
 #Función para calcular Ganancia mochila
-#n: num de items      #mE: vector solución      #moc: mochila a evaluar  
+#n: num de items      #mE: matriz detalle de Elementos      #moc: mochila a evaluar  
 def funCalculaGanancia(n,mE,moc):
     aux = 0
     for i in range(n-1):
@@ -43,6 +45,12 @@ def funCalculaPeso(n,mE,moc):
     for i in range(n-1):
         aux += (mE[i][1]) * moc[i]
     return aux
+#Función generadora vector Probabilidad
+def funVectorProb(n,tau):
+    vP = np.zeros(n)
+    for i in range(n):
+        vP[i] = (i+1)**(-tau)
+    return vP    
 
 ## Se crea matriz mochila (ex matrizDistancias)
 matrizMochila = matrizElementos[:, 2]
@@ -51,10 +59,28 @@ print(matrizMochila)
 print("Ganancia mochila: ", funCalculaGanancia(numVariables,matrizElementos,matrizMochila))
 print("Peso mochila: ", funCalculaPeso(numVariables,matrizElementos,matrizMochila))
 
+########################################
+###   Implementación del algoritmo   ###
+########################################
+generacion=0
+###1: Generar una solucion inicial randomica
+solInicial =  np.random.randint(2, size=numVariables) #Llenar primera columna con posicion inicial de las hormigas np.random.randint(0, numVariables, size=(1, col))
+print(solInicial)
+print("Ganancia mochila: ", funCalculaGanancia(numVariables,matrizElementos,solInicial))
+print("Peso mochila: ", funCalculaPeso(numVariables,matrizElementos,solInicial))
+if(funCalculaPeso(numVariables,matrizElementos,solInicial) > capacidad): #Si la solucion inicial no es valida, se llena con -1
+    solInicial = np.full((1, numVariables), fill_value=-1, dtype=int)
+###2: Se asigna como mejor solución
+solucionMejor = solInicial
+###3: Generar el vector de probabilidades P segun la ecuación
+vProb = funVectorProb(numVariables, tau)    
+###4: 
+while generacion < ite: ## generacion < ite:
+    generacion+=1
+    
+
+
 """
-## Generar matriz heuristica 1/matrizDistancia
-matrizHeuristica = np.full_like(matrizDistancias, fill_value=1/matrizDistancias, dtype=float)
-#print('Matriz de Heurística: \n', matrizHeuristica, '\ntamaño:', matrizHeuristica.shape, '\ntipo:', type(matrizHeuristica),'\n')
 
 #Se procede a crear colonia vacia (tamaño colonia x num variable) inicializado con el valor -1
 colonia=np.full((col, numVariables), fill_value=-1, dtype=int)
