@@ -105,7 +105,7 @@ print(solucion, solucionMejor.size)
 print("Ganancia solucionMejor ", funCalculaGanancia(numVariables,matrizElementos,solucion))
 print("Peso solucionMejor ", funCalculaPeso(numVariables,matrizElementos,solucion))
 """
-###3: Generar el vector de probabilidades P segun la ecuación
+###3: Generar el vector de probabilidades P segun la ecuación  44:20
 vProb = funVectorProb(numVariables, tau)
 # Vector Proporción 
 vProp = funVectorProp(numVariables, vProb) #print(vProp, vProp.size, "suma proporciones ",np.sum(vProp))
