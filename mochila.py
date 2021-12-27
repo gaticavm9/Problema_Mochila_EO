@@ -22,8 +22,9 @@ else:
 tiempo_proceso_ini = time.process_time()
 np.random.seed(semilla)
 
-capacidad=1000
-
+datosArchivo = pd.read_table(entrada, header=None, skiprows=2, nrows=2, sep=" ", names=range(2))
+capacidad = int(datosArchivo.drop(columns=0,axis=1).to_numpy()[0])
+valorOptimo = int(datosArchivo.drop(columns=0,axis=1).to_numpy()[1])
 ##Llenar una matriz con los valores del archivo   (ex matrizCoordenadas)
 matrizElementos = pd.read_table(entrada, header=None, skiprows=5, sep=",", names=range(4))
 matrizElementos = matrizElementos.drop(index=(len(matrizElementos)-1),axis=0)
@@ -32,51 +33,89 @@ numVariables = matrizElementos.shape[0]
 #print('Matriz de Elementos:\n', matrizElementos,'\ntamaño',matrizElementos.shape, '\ntipo',type(matrizElementos))
 #print('Número de variables:', numVariables,'\n')
 
+#######################################
+############   Funciones   ############
+#######################################
 #Función para calcular Ganancia mochila
 #n: num de items      #mE: matriz detalle de Elementos      #moc: mochila a evaluar  
 def funCalculaGanancia(n,mE,moc):
     aux = 0
-    for i in range(n-1):
+    for i in range(n):
         aux += (mE[i][0]) * moc[i]
     return aux
 #Función para calcular peso mochila
 def funCalculaPeso(n,mE,moc):
     aux = 0
-    for i in range(n-1):
+    for i in range(n):
         aux += (mE[i][1]) * moc[i]
     return aux
+#Función para Evaluar Solucion
+def funEvalSol(n,mE,sol):
+    if(funCalculaPeso(n,mE,sol) <= capacidad):
+        fact = True
+    else:
+        fact = False  
+    return fact
+
 #Función generadora vector Probabilidad
 def funVectorProb(n,tau):
-    vP = np.zeros(n)
+    vPb = np.zeros(n)
     for i in range(n):
-        vP[i] = (i+1)**(-tau)
-    return vP    
+        vPb[i] = (i+1)**(-tau)
+    return vPb
+#Función generadora vector Proporciones
+def funVectorProp(n,vPb):
+    sumProb=np.sum(vPb)
+    vPp = np.zeros(n)
+    for i in range(n):
+            vPp[i] = vPb[i]/sumProb
+    return vPp     
+#Función generadora vector Ruleta
+def funVectorRuleta(n,vPp):
+    vR = np.zeros(n)
+    for i in range(n):
+            vR[i] = vR[i-1] + vPp[i]
+    return vR        
 
-## Se crea matriz mochila (ex matrizDistancias)
-matrizMochila = matrizElementos[:, 2]
-print(matrizMochila)
+####################################################################
 
-print("Ganancia mochila: ", funCalculaGanancia(numVariables,matrizElementos,matrizMochila))
-print("Peso mochila: ", funCalculaPeso(numVariables,matrizElementos,matrizMochila))
 
 ########################################
 ###   Implementación del algoritmo   ###
 ########################################
 generacion=0
+solFactible=False
 ###1: Generar una solucion inicial randomica
-solInicial =  np.random.randint(2, size=numVariables) #Llenar primera columna con posicion inicial de las hormigas np.random.randint(0, numVariables, size=(1, col))
-print(solInicial)
-print("Ganancia mochila: ", funCalculaGanancia(numVariables,matrizElementos,solInicial))
-print("Peso mochila: ", funCalculaPeso(numVariables,matrizElementos,solInicial))
-if(funCalculaPeso(numVariables,matrizElementos,solInicial) > capacidad): #Si la solucion inicial no es valida, se llena con -1
-    solInicial = np.full((1, numVariables), fill_value=-1, dtype=int)
+solucion =  np.random.randint(2, size=numVariables) #Llena vector con 0 y 1
+#Evaluar
+solFactible = funEvalSol(numVariables,matrizElementos,solucion)
+print("Factible? ", solFactible)
 ###2: Se asigna como mejor solución
-solucionMejor = solInicial
+if(solFactible == True): #Si la solucion inicial no es valida, se llena con -1
+    solucionMejor = solucion
+else:
+    solucionMejor = solucion
+    solucionMejor = np.zeros(numVariables)
+"""
+print(solucionMejor, solucionMejor.size)
+print("Ganancia solucionMejor ", funCalculaGanancia(numVariables,matrizElementos,solucionMejor))
+print("Peso solucionMejor ", funCalculaPeso(numVariables,matrizElementos,solucionMejor))
+###
+print(solucion, solucionMejor.size)
+print("Ganancia solucionMejor ", funCalculaGanancia(numVariables,matrizElementos,solucion))
+print("Peso solucionMejor ", funCalculaPeso(numVariables,matrizElementos,solucion))
+"""
 ###3: Generar el vector de probabilidades P segun la ecuación
-vProb = funVectorProb(numVariables, tau)    
+vProb = funVectorProb(numVariables, tau)
+# Vector Proporción 
+vProp = funVectorProp(numVariables, vProb) #print(vProp, vProp.size, "suma proporciones ",np.sum(vProp))
+# Vector Ruleta
+vRuleta = funVectorRuleta(numVariables, vProp) #print(vRuleta, vRuleta.size, "suma proporciones ",np.sum(vRuleta))
+
+
+
 ###4: 
-while generacion < ite: ## generacion < ite:
-    generacion+=1
+
     
 
 
