@@ -51,7 +51,7 @@ def funCalculaPeso(n,mE,moc):
     return aux
 #Función para Evaluar Solucion
 def funEvalSol(n,mE,sol):
-    if(funCalculaPeso(n,mE,sol) <= capacidad):
+    if(funCalculaPeso(n,mE,sol) <= capacidad):   # 53484
         fact = True
     else:
         fact = False  
@@ -77,6 +77,12 @@ def funVectorRuleta(n,vPp):
             vR[i] = vR[i-1] + vPp[i]
     return vR        
 
+#Función Fitness
+def funFitness(n,mE):
+    fit = np.zeros(n)
+    for i in range(n):
+            fit[i] = mE[i][0] / mE[i][1]
+    return fit 
 ####################################################################
 
 
@@ -96,6 +102,7 @@ if(solFactible == True): #Si la solucion inicial no es valida, se llena con -1
 else:
     solucionMejor = solucion
     solucionMejor = np.zeros(numVariables)
+gananciaSolMejor = funCalculaGanancia(numVariables,matrizElementos,solucionMejor)
 """
 print(solucionMejor, solucionMejor.size)
 print("Ganancia solucionMejor ", funCalculaGanancia(numVariables,matrizElementos,solucionMejor))
@@ -105,17 +112,24 @@ print(solucion, solucionMejor.size)
 print("Ganancia solucionMejor ", funCalculaGanancia(numVariables,matrizElementos,solucion))
 print("Peso solucionMejor ", funCalculaPeso(numVariables,matrizElementos,solucion))
 """
-###3: Generar el vector de probabilidades P segun la ecuación  44:20
+###3: Generar el vector de probabilidades P segun la ecuación               44:20
 vProb = funVectorProb(numVariables, tau)
 # Vector Proporción 
 vProp = funVectorProp(numVariables, vProb) #print(vProp, vProp.size, "suma proporciones ",np.sum(vProp))
 # Vector Ruleta
 vRuleta = funVectorRuleta(numVariables, vProp) #print(vRuleta, vRuleta.size, "suma proporciones ",np.sum(vRuleta))
 
+#Vector con valores Fitness para cada item
+vFit = funFitness(numVariables,matrizElementos) #print("Valores Fitness: \n",vFit, vFit.size)
 
-
-###4: 
-
+###4: For a ite number of iterations do                 44:45
+while generacion<ite and gananciaSolMejor<valorOptimo:    ## generacion < ite:
+    generacion+=1
+    print(generacion)
+    if generacion==995:
+        gananciaSolMejor=2696
+    if gananciaSolMejor >= valorOptimo:
+        print("valor optimo encontrado ", gananciaSolMejor)
     
 
 
