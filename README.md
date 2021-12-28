@@ -29,5 +29,5 @@ Al momento de ejecutar la aplicación se deben ingresar los siguientes parámetr
  python mochila.py 1 1.4 1000 dat_3_200_1.txt
  python mochila.py 1 1.4 1000 dat_2_500_1000.txt
  python mochila.py 1 1.4 1000 dat_12_500_1000.txt
- python mochila.py 1 1.4 2000 dat_3_1000_100000.txt
+ python mochila.py 1 1.4 9000 dat_3_1000_100000.txt
 ```
