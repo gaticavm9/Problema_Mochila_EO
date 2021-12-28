@@ -90,8 +90,8 @@ fitness_t feasibleFitness (vector<int> x, fitness_t f) {
   fitness_t sorted_f;
   for(unsigned int i=0; i<x.size(); i++)
     if(x[i]==0)
-      sorted f.push_back(make_pair(f[i].first, f[i].second));
-     sort(sorted f.begin(), sorted_f.end(), comparisonTopDown);
+      sorted_f.push_back(make_pair(f[i].first, f[i].second));
+    sort(sorted_f.begin(), sorted_f.end(), comparisonTopDown);
   return sorted_f;
 }
                                         

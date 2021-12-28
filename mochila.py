@@ -79,10 +79,39 @@ def funVectorRuleta(n,vPp):
 
 #Función Fitness
 def funFitness(n,mE):
-    fit = np.zeros(n)
+    fit = np.zeros((n,2))
     for i in range(n):
-            fit[i] = mE[i][0] / mE[i][1]
+            fit[i][0] = mE[i][0] / mE[i][1]
+            fit[i][1] = i
     return fit 
+#Función Ordenar Fitness Sol Factible
+def funFitnessFactible(sol,fit):
+    n=sol.size
+    fitOrd = np.zeros((n,2))
+    for i in range(n):  
+        if sol[i] == 0:
+            fitOrd[i][0]= fit[i][0]  #Agrega los fitnes de los items que no estan en mochila
+            fitOrd[i][1]= fit[i][1]   #identificador del item         
+    #Elimina 0
+    fitOrd = np.delete(fitOrd, np.where(fitOrd[:, 0] == 0)[0], axis=0)
+    #ordena
+    fitOrd = fitOrd[fitOrd[:, 0].argsort()]
+    fitOrd=fitOrd[::-1]  #Mayor a Menor       
+    return fitOrd   
+
+#Función Ordenar Fitness Sol NO Factible
+def funFitnessNoFac(sol,fit):
+    n=sol.size
+    fitOrd = np.zeros((n,2))
+    for i in range(n):  
+        if sol[i] == 1:   #1
+            fitOrd[i][0]= fit[i][0]  #Agrega los fitnes de los items que no estan en mochila
+            fitOrd[i][1]= fit[i][1]   #identificador del item         
+    #Elimina 0
+    fitOrd = np.delete(fitOrd, np.where(fitOrd[:, 0] == 0)[0], axis=0)
+    #ordena
+    fitOrd = fitOrd[fitOrd[:, 0].argsort()]
+    return fitOrd       
 ####################################################################
 
 
@@ -125,16 +154,34 @@ vFit = funFitness(numVariables,matrizElementos) #print("Valores Fitness: \n",vFi
 ###4: For a ite number of iterations do                 44:45
 while generacion<ite and gananciaSolMejor<valorOptimo:    ## generacion < ite:
     generacion+=1
-    print(generacion)
-    if generacion==995:
-        gananciaSolMejor=2696
-    if gananciaSolMejor >= valorOptimo:
-        print("valor optimo encontrado ", gananciaSolMejor)
-    
+    #condicion
+    if solFactible==True:  #True
+        vFitOrdenado = funFitnessFactible(solucion, vFit)
+    else:
+        vFitOrdenado = funFitnessNoFac(solucion, vFit)
+
+
+
+print(vFit,vFit.size)
+print(vFitOrdenado,vFitOrdenado.size)
+
+ 
+
+
+
+
+
 
 
 """
+#Salida
+print(gananciaSolMejor)
+print(solucion)
+print(generacion)
+"""
 
+
+"""
 #Se procede a crear colonia vacia (tamaño colonia x num variable) inicializado con el valor -1
 colonia=np.full((col, numVariables), fill_value=-1, dtype=int)
 #print('Colonia:\n',colonia, '\ntamaño:', colonia.shape, '\ntipo:', type(colonia),'\n')
