@@ -74,7 +74,7 @@ int rouletteDraw(roulette t ruleta){
   bool leave=false;
   double draw=0.0;
 
-  draw=fRandotol();
+  draw=fRand0tol();
   //cout « "\ndraw: " << draw < endl;
   do {
     if(draw <= ruleta.r[i]){

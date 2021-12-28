@@ -63,6 +63,7 @@ def funVectorProb(n,tau):
     for i in range(n):
         vPb[i] = (i+1)**(-tau)
     return vPb
+"""    
 #Función generadora vector Proporciones
 def funVectorProp(n,vPb):
     sumProb=np.sum(vPb)
@@ -76,7 +77,7 @@ def funVectorRuleta(n,vPp):
     for i in range(n):
             vR[i] = vR[i-1] + vPp[i]
     return vR        
-
+"""
 #Función Fitness
 def funFitness(n,mE):
     fit = np.zeros((n,2))
@@ -111,7 +112,33 @@ def funFitnessNoFac(sol,fit):
     fitOrd = np.delete(fitOrd, np.where(fitOrd[:, 0] == 0)[0], axis=0)
     #ordena
     fitOrd = fitOrd[fitOrd[:, 0].argsort()]
-    return fitOrd       
+    return fitOrd
+
+#Función Crear Ruleta
+def funCrearRuleta(n):
+    vR = np.zeros(n)
+    vPp = np.zeros(n)
+    sumProb = 0.0
+    for i in range(n):
+        sumProb = sumProb + vProb[i]
+    for i in range(n):
+            vPp[i] = vProb[i]/sumProb
+    #vR[0] = Vp[0]        
+    for i in range(n):
+            vR[i] = vR[i-1] + vPp[i]     
+    return vR
+#Función Girar Ruleta
+def funGirarRuleta(vR):
+    aux=0
+    listo = False
+    giro = 0.0
+    giro = random.uniform(0, 1)    
+    while listo==False:
+        if giro <= vR[aux]:
+            listo = True
+        else:
+            aux = aux+1        
+    return aux             
 ####################################################################
 
 
@@ -124,7 +151,6 @@ solFactible=False
 solucion =  np.random.randint(2, size=numVariables) #Llena vector con 0 y 1
 #Evaluar
 solFactible = funEvalSol(numVariables,matrizElementos,solucion)
-print("Factible? ", solFactible)
 ###2: Se asigna como mejor solución
 if(solFactible == True): #Si la solucion inicial no es valida, se llena con -1
     solucionMejor = solucion
@@ -143,10 +169,8 @@ print("Peso solucionMejor ", funCalculaPeso(numVariables,matrizElementos,solucio
 """
 ###3: Generar el vector de probabilidades P segun la ecuación               44:20
 vProb = funVectorProb(numVariables, tau)
-# Vector Proporción 
-vProp = funVectorProp(numVariables, vProb) #print(vProp, vProp.size, "suma proporciones ",np.sum(vProp))
-# Vector Ruleta
-vRuleta = funVectorRuleta(numVariables, vProp) #print(vRuleta, vRuleta.size, "suma proporciones ",np.sum(vRuleta))
+# Vector Proporción #vProp = funVectorProp(numVariables, vProb) #print(vProp, vProp.size, "suma proporciones ",np.sum(vProp))
+# Vector Ruleta#vRuleta = funVectorRuleta(numVariables, vProp) #print(vRuleta, vRuleta.size, "suma proporciones ",np.sum(vRuleta))
 
 #Vector con valores Fitness para cada item
 vFit = funFitness(numVariables,matrizElementos) #print("Valores Fitness: \n",vFit, vFit.size)
@@ -154,31 +178,36 @@ vFit = funFitness(numVariables,matrizElementos) #print("Valores Fitness: \n",vFi
 ###4: For a ite number of iterations do                 44:45
 while generacion<ite and gananciaSolMejor<valorOptimo:    ## generacion < ite:
     generacion+=1
-    #condicion
+    #Generar fitness para solucion
     if solFactible==True:  #True
         vFitOrdenado = funFitnessFactible(solucion, vFit)
     else:
         vFitOrdenado = funFitnessNoFac(solucion, vFit)
+    #Generar Ruleta de acuerdo al tamano del Fitness Ordenado
+    vRuleta = funCrearRuleta(int(vFitOrdenado.size/2))
+    #Seleccionar item de la ruleta
+    itemSelec = funGirarRuleta(vRuleta)
+
+    #Cambiar el valor en solucion del item seleccionado
+    if int(solucion[int(vFitOrdenado[itemSelec][1])])==0:
+        solucion[int(vFitOrdenado[itemSelec][1])]=1
+    else:
+        solucion[int(vFitOrdenado[itemSelec][1])]=0
+    
+    #Evaluar nueva solucion
+    solFactible = funEvalSol(numVariables,matrizElementos,solucion)
+    gananciaSol = funCalculaGanancia(numVariables,matrizElementos,solucion)
+    #Si la nueva solucion es Factible y mejor que la solucionMejor actual, se actualiza
+    if (solFactible==True and gananciaSol>gananciaSolMejor):
+        solucionMejor = solucion
+        gananciaSolMejor = funCalculaGanancia(numVariables,matrizElementos,solucionMejor)
+# ------------ termino ciclo While -------------    
+### Salida
+print("Ganancia de mejor solucion ",gananciaSolMejor)
+print("Iteraciones realizadas ",generacion)
+print("Mejor solucion: \n",solucion)
 
 
-
-print(vFit,vFit.size)
-print(vFitOrdenado,vFitOrdenado.size)
-
- 
-
-
-
-
-
-
-
-"""
-#Salida
-print(gananciaSolMejor)
-print(solucion)
-print(generacion)
-"""
 
 
 """
