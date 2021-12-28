@@ -23,8 +23,11 @@ Al momento de ejecutar la aplicación se deben ingresar los siguientes parámetr
 - Número de iteraciones (condición de término).
 - Nombre del archivo de entrada (archivo con datos para el análisis).
 
-## Ejemplo de ejecución
+## Ejemplos de ejecución
 
 ```properties
  python mochila.py 1 1.4 1000 dat_3_200_1.txt
+ python mochila.py 1 1.4 1000 dat_2_500_1000.txt
+ python mochila.py 1 1.4 1000 dat_12_500_1000.txt
+ python mochila.py 1 1.4 2000 dat_3_1000_100000.txt
 ```
