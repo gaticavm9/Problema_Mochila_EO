@@ -25,6 +25,8 @@ np.random.seed(semilla)
 datosArchivo = pd.read_table(entrada, header=None, skiprows=2, nrows=2, sep=" ", names=range(2))
 capacidad = int(datosArchivo.drop(columns=0,axis=1).to_numpy()[0])
 valorOptimo = int(datosArchivo.drop(columns=0,axis=1).to_numpy()[1])
+print("***************************************")
+print("Valor Optimo esperado: ",valorOptimo)
 ##Llenar una matriz con los valores del archivo   (ex matrizCoordenadas)
 matrizElementos = pd.read_table(entrada, header=None, skiprows=5, sep=",", names=range(4))
 matrizElementos = matrizElementos.drop(index=(len(matrizElementos)-1),axis=0)
@@ -203,6 +205,6 @@ while generacion<ite and gananciaSolMejor<valorOptimo:    ## generacion < ite:
         gananciaSolMejor = funCalculaGanancia(numVariables,matrizElementos,solucionMejor)
 # ------------ termino ciclo While -------------    
 ### Salida
-print("Ganancia de mejor solucion ",gananciaSolMejor)
-print("Iteraciones realizadas ",generacion)
+print("Ganancia de mejor solucion encontrada: ",gananciaSolMejor)
+print("Iteraciones realizadas: ",generacion)
 print("Mejor solucion: \n",solucion)
